@@ -17,7 +17,7 @@ A biblioteca foi desenvolvida para aplicações em hidrologia, modelagem ambient
 
 ### Instalação local
 
-git clone https://github.com/seuusuario/hidroana.git
+git clone https://github.com/grendamenezes/hidroana.git
 cd hidroana
 pip install -e .
 
