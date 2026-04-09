@@ -2,6 +2,7 @@ from zeep import Client, Settings
 import xml.etree.ElementTree as ET
 import pandas as pd
 from tqdm import tqdm
+from datetime import datetime
 import re
 
 def get_inventory (caminho_saida="inventario_ana.csv",
@@ -238,13 +239,13 @@ def get_telemetric_inventory (df, caminho="", save_info = False):
 #   caminho  -> Caminho onde os arquivos CSV serão salvos
 # ===============================================================
 
-def get_telemetric_list (list_est=[], d_i, d_f, caminho=""):
-    if len(list_est) == 0:
+def get_telemetric_list (list_est, d_i, d_f, caminho=""):
+    if len(list_est) == 0 or list_est == None:
         print("\nErro: Lista de estações não fornecida.")
         return
     try:
-        d_i.datetime.strptime(d_i, "%Y-%m-%d")
-        d_f.datetime.strptime(d_f, "%Y-%m-%d")
+        datetime.strptime(d_i, "%Y-%m-%d")
+        datetime.strptime(d_f, "%Y-%m-%d")
     except ValueError:
         print("\nErro: Formato de data inválido. Use YYYY-MM-DD.")
         return
@@ -327,15 +328,14 @@ def get_telemetric_list (list_est=[], d_i, d_f, caminho=""):
 #         2 = mantém apenas dados de nível de consistência 2
 # ===============================================================
 
-def get_conv_data_list (list_est=[], d_i, d_f, tipo,caminho="", cons=1):
-    
-    if len(list_est) == 0:
+def get_conv_data_list (list_est, d_i, d_f, tipo,caminho="", cons=1):
+    if len(list_est) == 0 or list_est == None:
         print("\nErro: Lista de estações não fornecida.")
         return
     
     try:
-        d_i.datetime.strptime(d_i, "%Y-%m-%d")
-        d_f.datetime.strptime(d_f, "%Y-%m-%d")
+        datetime.strptime(d_i, "%Y-%m-%d")
+        datetime.strptime(d_f, "%Y-%m-%d")
     except ValueError:
         print("\nErro: Formato de data inválido. Use YYYY-MM-DD.")
         return
