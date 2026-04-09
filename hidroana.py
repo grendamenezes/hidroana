@@ -450,7 +450,7 @@ def get_conv_data_list (list_est, d_i, d_f, tipo,caminho="", cons=1):
 #         2 = mantém apenas dados de nível de consistência 2
 # ===============================================================
 
-def get_conv_inventory (df, caminho="", tipo, cons=1,save_info = False):
+def get_conv_inventory (df, tipo, caminho="", cons=1,save_info = False):
     # URL do serviço SOAP da ANA
     wsdl = "https://telemetriaws1.ana.gov.br/ServiceANA.asmx?WSDL"
 
