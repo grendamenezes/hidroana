@@ -1,4 +1,9 @@
 from setuptools import setup, find_packages
+from pathlib import Path
+
+this_directory = Path(__file__).parent
+
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
  
 classifiers=[
     'Development Status :: 4 - Beta',
@@ -13,7 +18,8 @@ setup(
   name='hidroana',
   version='0.0.1',
   description='Download and process hydrological data from ANA (Brazil)',
-  long_description = open('README.txt').read() + '\n\n' + open('CHANGELOG.txt').read(),
+  long_description=long_description,
+  long_description_content_type='text/markdown',
   url='',  
   author='Grenda Menezes',
   author_email='grenda.menezes@gmail.com',
