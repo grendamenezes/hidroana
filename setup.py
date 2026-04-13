@@ -16,10 +16,10 @@ classifiers=[
  
 setup(
   name='hidroana',
-  version='0.0.1',
+  version='0.0.2',
   description='Download and process hydrological data from ANA (Brazil)',
   long_description=long_description,
-  long_description_content_type='text/markdown',
+  long_description_content_type='text/plain',
   url='',  
   author='Grenda Menezes',
   author_email='grenda.menezes@gmail.com',
