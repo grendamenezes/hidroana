@@ -16,7 +16,7 @@ classifiers=[
  
 setup(
   name='hidroana',
-  version='0.0.5',
+  version='0.0.6',
   description='Download and process hydrological data from ANA (Brazil)',
   long_description=long_description,
   long_description_content_type='text/markdown',
