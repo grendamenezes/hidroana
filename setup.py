@@ -3,7 +3,7 @@ from pathlib import Path
 
 this_directory = Path(__file__).parent
 
-long_description = (this_directory / "README.txt").read_text(encoding="utf-8")
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
  
 classifiers=[
     'Development Status :: 4 - Beta',
@@ -26,8 +26,7 @@ setup(
   license='MIT', 
   classifiers=classifiers,
   keywords='hydrology ana brazil rainfall streamflow', 
-  package_dir={"": "src"},
-  packages=find_packages(where="src"),
+  packages=find_packages(),
   install_requires=[
         'pandas',
         'tqdm',
