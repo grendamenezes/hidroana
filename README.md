@@ -48,30 +48,74 @@ import hidroana
 
 # 1. get_inventory()
 
-Consulta o inventário oficial de estações da ANA.
+Consulta o inventário oficial de estações hidrológicas da ANA e retorna os metadados em formato tabular.
 
 ## Sintaxe
 
 ```python
-hidroana.get_inventory(...)
+hidroana.get_inventory(
+    caminho_saida="inventario_ana.csv",
+    var_codEstDE="",
+    var_codEstATE="",
+    var_tpEst="",
+    var_nmEst="",
+    var_nmRio="",
+    var_codSubBacia="",
+    var_codBacia="",
+    var_nmMunicipio="",
+    var_nmEstado="",
+    var_sgResp="",
+    var_sgOper="",
+    var_telemetrica="",
+    save=False
+)
 ```
 
-## Parâmetros principais
+---
 
-| Parâmetro       | Tipo | Default            | Descrição                |
-| --------------- | ---- | ------------------ | ------------------------ |
-| caminho_saida   | str  | inventario_ana.csv | Nome do arquivo de saída |
-| var_tpEst       | str  | ""                 | Tipo de estação          |
-| var_nmEstado    | str  | ""                 | UF                       |
-| var_nmMunicipio | str  | ""                 | Município                |
-| var_nmRio       | str  | ""                 | Nome do rio              |
-| var_telemetrica | str  | ""                 | 1 = sim / 0 = não        |
-| save            | bool | False              | Salvar CSV               |
+## Parâmetros
 
-## Tipo de estação (`var_tpEst`)
+| Parâmetro       | Tipo | Default                | Descrição                                           |
+| --------------- | ---- | ---------------------- | --------------------------------------------------- |
+| caminho_saida   | str  | `"inventario_ana.csv"` | Nome/caminho do arquivo CSV de saída                |
+| var_codEstDE    | str  | `""`                   | Código inicial da estação para filtro por intervalo |
+| var_codEstATE   | str  | `""`                   | Código final da estação para filtro por intervalo   |
+| var_tpEst       | str  | `""`                   | Tipo de estação                                     |
+| var_nmEst       | str  | `""`                   | Nome da estação                                     |
+| var_nmRio       | str  | `""`                   | Nome do rio                                         |
+| var_codSubBacia | str  | `""`                   | Código da sub-bacia                                 |
+| var_codBacia    | str  | `""`                   | Código da bacia hidrográfica                        |
+| var_nmMunicipio | str  | `""`                   | Nome do município                                   |
+| var_nmEstado    | str  | `""`                   | Unidade federativa (UF)                             |
+| var_sgResp      | str  | `""`                   | Sigla da entidade responsável                       |
+| var_sgOper      | str  | `""`                   | Sigla da entidade operadora                         |
+| var_telemetrica | str  | `""`                   | Filtrar estações telemétricas                       |
+| save            | bool | `False`                | Salva o resultado em CSV                            |
 
-* `"1"` = Fluviométrica
-* `"2"` = Pluviométrica
+---
+
+## Valores específicos
+
+### `var_tpEst`
+
+| Valor | Tipo          |
+| ----- | ------------- |
+| `"1"` | Fluviométrica |
+| `"2"` | Pluviométrica |
+
+Se vazio (`""`), retorna todos os tipos disponíveis.
+
+---
+
+### `var_telemetrica`
+
+| Valor | Significado              |
+| ----- | ------------------------ |
+| `"1"` | Somente telemétricas     |
+| `"0"` | Somente não telemétricas |
+| `""`  | Todas                    |
+
+---
 
 ## Retorno
 
@@ -79,14 +123,24 @@ hidroana.get_inventory(...)
 pandas.DataFrame
 ```
 
-## Exemplo
+Tabela contendo os registros do inventário da ANA conforme os filtros aplicados.
+
+---
+
+## Exemplos
+
+### 1. Estações pluviométricas do Paraná
 
 ```python
 df = hidroana.get_inventory(
     var_nmEstado="PR",
-    var_tpEst="2"
+    var_tpEst="2",
+    save=True,
+    caminho_saida="inventario_pr.csv"
 )
 ```
+
+---
 
 ## Observação importante sobre códigos de estações telemétricas
 
@@ -275,7 +329,9 @@ hidroana.get_conv_inventory(
 
 # 6. get_series_by_shape()
 
-Seleciona estações dentro de um shapefile / GeoPackage com buffer espacial e faz download automático.
+Seleciona estações da ANA localizadas dentro de uma área espacial (Shapefile ou GeoPackage), com opção de buffer, e realiza o download automático das séries hidrológicas.
+
+---
 
 ## Sintaxe
 
@@ -293,20 +349,58 @@ hidroana.get_series_by_shape(
 )
 ```
 
+---
+
 ## Parâmetros
 
-| Parâmetro | Descrição             |
-| --------- | --------------------- |
-| arquivo   | shp ou gpkg           |
-| d_i       | Data inicial          |
-| d_f       | Data final            |
-| buffer_km | Buffer em km          |
-| layer     | Nome da camada (gpkg) |
-| rede      | "conv" ou "tele"      |
-| tipo_dado | 1,2,3                 |
-| caminho   | Pasta saída           |
+| Parâmetro      | Tipo       | Default     | Descrição                                       |
+| -------------- | ---------- | ----------- | ----------------------------------------------- |
+| arquivo        | str        | obrigatório | Caminho para arquivo `.shp` ou `.gpkg`          |
+| d_i            | str        | obrigatório | Data inicial no formato `YYYY-MM-DD`            |
+| d_f            | str        | obrigatório | Data final no formato `YYYY-MM-DD`              |
+| buffer_km      | float      | `0`         | Distância de buffer ao redor da geometria (km)  |
+| layer          | str / None | `None`      | Nome da camada, quando `arquivo` for GeoPackage |
+| rede           | str        | `"conv"`    | Tipo de rede: convencional ou telemétrica       |
+| tipo_dado      | str        | `"2"`       | Tipo de dado a baixar                           |
+| caminho        | str        | `""`        | Pasta de saída                                  |
+| save_inventory | bool       | `True`      | Salva inventário filtrado em CSV                |
 
-## Exemplo com shapefile
+---
+
+## Valores específicos
+
+### `rede`
+
+| Valor    | Significado       |
+| -------- | ----------------- |
+| `"conv"` | Rede convencional |
+| `"tele"` | Rede telemétrica  |
+
+---
+
+### `tipo_dado`
+
+| Valor | Tipo  |
+| ----- | ----- |
+| `"1"` | Cota  |
+| `"2"` | Chuva |
+| `"3"` | Vazão |
+
+---
+
+## Saída
+
+Dependendo dos parâmetros informados, a função pode gerar:
+
+* Inventário filtrado espacialmente
+* Um arquivo CSV por estação selecionada
+* Arquivo `info_estacoes.csv` com resumo de disponibilidade
+
+---
+
+## Exemplo
+
+### Selecionar estações de chuva em uma bacia hidrográfica
 
 ```python
 hidroana.get_series_by_shape(
@@ -320,26 +414,21 @@ hidroana.get_series_by_shape(
 )
 ```
 
-## O que faz
-
-1. Lê o shapefile
-2. Aplica buffer
-3. Busca inventário ANA
-4. Seleciona estações dentro da área
-5. Salva inventário filtrado
-6. Baixa séries automaticamente
-
 ---
 
-# Estrutura dos Arquivos Gerados
+### Usando GeoPackage com layer específica
 
-```text
-saida/
-├── 02549000.csv
-├── 74355000.csv
-├── info_estacoes.csv
-└── inventario_filtrado.csv
+```python
+hidroana.get_series_by_shape(
+    arquivo="bacias.gpkg",
+    layer="rio_principal",
+    d_i="2010-01-01",
+    d_f="2020-12-31",
+    rede="tele",
+    caminho="./dados/"
+)
 ```
+
 
 ---
 

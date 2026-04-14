@@ -620,10 +620,10 @@ def get_series_by_shape(
         area = gdf.union_all()
 
     # Inventário ANA
-    if rede == "conv" or tipo_dado == "1":
+    if rede == "conv" or tipo_dado == "3":
         inv = get_inventory(var_tpEst=tipo_dado)
     elif rede == "tele":
-        if tipo_dado == "2":
+        if tipo_dado in ["2", "1"]:
             inv = get_inventory()
     else:
         raise ValueError("Rede deve ser 'conv' ou 'tele'.")
