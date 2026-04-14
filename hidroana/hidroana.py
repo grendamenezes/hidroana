@@ -2,13 +2,19 @@ from zeep import Client, Settings
 import xml.etree.ElementTree as ET
 import pandas as pd
 from tqdm import tqdm
+import os
 from datetime import datetime
+import geopandas as gpd
+import pandas as pd
 import re
+import logging
+
+logging.getLogger("zeep").setLevel(logging.ERROR)
 
 def get_inventory (caminho_saida="inventario_ana.csv",
                    var_codEstDE="", 
                    var_codEstATE="", 
-                   var_tpEst="2", 
+                   var_tpEst="", 
                    var_nmEst="", 
                    var_nmRio="", 
                    var_codSubBacia="", 
@@ -210,10 +216,6 @@ def get_telemetric_inventory (df, caminho="", save_info = False):
         # Salva arquivo CSV da estação
         df.to_csv(f"{caminho}{cod}.csv", index=True)
 
-    # Mensagem final
-    caminho_final = caminho if caminho != "" else "./"
-    print(f"\nDownload concluído! Arquivos salvos em: {caminho_final}")
-
     # Adiciona colunas de disponibilidade e salva resumo geral
     df_info['TemChuva'] = st_chuva
     df_info['TemVazao'] = st_vazao
@@ -303,9 +305,6 @@ def get_telemetric_list (list_est, d_i, d_f, caminho=""):
         df.sort_index(inplace=True)
         # Exporta CSV
         df.to_csv(f"{caminho}{est}.csv", index=True)
-    # Mensagem final
-    caminho_final = caminho if caminho != "" else "./"
-    print(f"\nDownload concluído! Arquivos salvos em: {caminho_final}")
     return 
 
 # ===============================================================
@@ -424,10 +423,6 @@ def get_conv_data_list (list_est, d_i, d_f, tipo,caminho="", cons=1):
 
         # Exporta CSV
         df_final.to_csv(f"{caminho}{est}.csv", index=False)
-
-    # Mensagem final
-    caminho_final = caminho if caminho != "" else "./"
-    print(f"\nDownload concluído! Arquivos salvos em: {caminho_final}")
 
     return
 
@@ -560,9 +555,6 @@ def get_conv_inventory (df, tipo, caminho="", cons=1,save_info = False):
 
         # Exporta CSV
         df_final.to_csv(f"{caminho}{cod}.csv", index=False)
-    # Mensagem final
-    caminho_final = caminho if caminho != "" else "./"
-    print(f"\nDownload concluído! Arquivos salvos em: {caminho_final}")
 
     df_info[f'Tem{dic_tipo[tipo]}'] = st
 
@@ -571,3 +563,95 @@ def get_conv_inventory (df, tipo, caminho="", cons=1,save_info = False):
         print(f"\nResumo geral salvo em: {caminho}info_estacoes.csv")
     
     return df_info
+
+# ===============================================================
+# Função: get_series_by_shape(arquivo, d_i, d_f, buffer_km, layer, rede, tipo_dado, caminho)
+# ---------------------------------------------------------------
+# Objetivo:
+#     Baixa séries ANA para estações dentro de um shapefile/gpkg + buffer.
+
+# Entradas:
+#     arquivo : str
+#         Caminho do shp ou gpkg
+#     d_i : str
+#         Data inicial YYYY-MM-DD
+#     d_f : str
+#         Data final YYYY-MM-DD
+#     buffer_km : float
+#         Buffer em km
+#     layer : str
+#         Nome da camada (se gpkg)
+#     rede : str
+#         'conv' ou 'tele'
+#     tipo_dado : str
+#         Convencional:
+#             1 = Cota
+#             2 = Chuva
+#             3 = Vazão
+#     caminho : str
+#         Pasta saída
+# ===============================================================
+
+def get_series_by_shape(
+    arquivo,
+    d_i,
+    d_f,
+    buffer_km=0,
+    layer=None,
+    rede="conv",
+    tipo_dado="2",
+    caminho="",
+    save_inventory=True
+):
+
+    # Ler arquivo
+    gdf = gpd.read_file(arquivo, layer=layer)
+
+    if gdf.crs is None:
+        raise ValueError("Arquivo sem CRS definido.")
+
+    # Projetar para metros
+    gdf = gdf.to_crs(3857)
+
+    # Buffer
+    if buffer_km > 0:
+        area = gdf.buffer(buffer_km * 1000).union_all()
+    else:
+        area = gdf.union_all()
+
+    # Inventário ANA
+    inv = get_inventory(var_tpEst=tipo_dado)
+
+    # Estações
+    est = gpd.GeoDataFrame(
+        inv,
+        geometry=gpd.points_from_xy(
+            inv["Longitude"].astype(float),
+            inv["Latitude"].astype(float)
+        ),
+        crs="EPSG:4326"
+    ).to_crs(3857)
+
+    # Seleção espacial
+    sel = est[est.geometry.within(area)]
+
+    lista = sel["Codigo"].astype(str).tolist()
+
+    print(f"{len(lista)} estações encontradas.")
+
+    if len(lista) == 0:
+        return sel
+    
+    # Salvar inventário filtrado
+    if save_inventory:
+        arquivo_inv = os.path.join(caminho, "inventario_filtrado.csv")
+        sel.drop(columns="geometry").to_csv(arquivo_inv, index=False)
+        print(f"Inventário salvo em: {arquivo_inv}")
+
+    # Download
+    if rede == "conv":
+        get_conv_data_list(lista, d_i, d_f, tipo_dado, caminho)
+    else:
+        get_telemetric_list(lista, d_i, d_f, caminho)
+
+    return sel
