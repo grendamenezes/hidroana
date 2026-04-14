@@ -88,6 +88,32 @@ df = hidroana.get_inventory(
 )
 ```
 
+## Observação importante sobre códigos de estações telemétricas
+
+Na base da ANA, algumas estações possuem:
+
+* código **pluviométrico (plu)**
+* código **fluviométrico (flu)**
+* ou ambos
+
+Para consultas telemétricas, o comportamento do serviço pode variar:
+
+* Se a estação for **apenas pluviométrica**, normalmente a consulta funciona com o código pluviométrico.
+* Se a estação possuir **código pluviométrico e fluviométrico**, o serviço da ANA geralmente retorna as séries corretamente **quando a requisição é feita com o código fluviométrico**.
+
+### Recomendação
+
+Sempre que a estação possuir ambos os códigos, prefira utilizar o **código fluviométrico** nas funções telemétricas.
+
+Se o objetivo for baixar dados telemétricos pelo inventário, recomenda-se gerar o inventário **sem definir var_tpEst**.
+
+Isso é especialmente importante para:
+
+* `get_telemetric_inventory()`
+* `get_telemetric_list()`
+
+Caso contrário, a estação pode ser encontrada no inventário, mas não retornar dados telemétricos.
+
 ---
 
 # 2. get_telemetric_inventory()
