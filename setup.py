@@ -16,7 +16,7 @@ classifiers=[
  
 setup(
   name='hidroana',
-  version='0.0.7',
+  version='0.1.0',
   description='Download and process hydrological data from ANA (Brazil)',
   long_description=long_description,
   long_description_content_type='text/markdown',
@@ -28,10 +28,14 @@ setup(
   keywords='hydrology ana brazil rainfall streamflow', 
   packages=find_packages(),
   install_requires=[
-        'pandas',
-        'tqdm',
-        'zeep',
-        'geopandas'
+        "pandas",
+        "numpy",
+        "tqdm",
+        "zeep",
+        "geopandas",
+        "matplotlib",
+        "plotly",
+        "geovoronoi"
     ],
   python_requires='>=3.8',
 
