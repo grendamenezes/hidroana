@@ -126,7 +126,7 @@ hidroana.get_conv_data_list(
 
 ```python
 hidroana.get_conv_data_list(
-    ["02549000"],
+    ["2549000"],
     "1990-01-01",
     "2020-12-31",
     tipo="3",
@@ -138,7 +138,8 @@ hidroana.get_conv_data_list(
 
 ### Gráfico de disponibilidade gerado
 
-![Disponibilidade de Vazão Convencional](hidroana/giant_plot_disponibilidade_Vazao_convencional.png)
+<img src="https://raw.githubusercontent.com/grendamenezes/hidroana/refs/heads/main/hidroana/giant_plot_disponibilidade_Vazao_convencional.png"/>
+
 
 ## `get_conv_inventory`
 
@@ -187,7 +188,7 @@ resumo = hidroana.get_conv_inventory(
 
 ### Mapa de disponibilidade gerado
 
-![MAPA](hidroana/mapa_alagoas.png)
+<img src="https://raw.githubusercontent.com/grendamenezes/hidroana/refs/heads/main/hidroana/mapa_alagoas.png"/>
 
 
 ## `get_telemetric_inventory`
@@ -350,7 +351,7 @@ hidroana.get_series_by_shape(
 
 ### Mapa de disponibilidade gerado
 
-![Mapa Area](hidroana/mapa_area.png)
+<img src="https://raw.githubusercontent.com/grendamenezes/hidroana/refs/heads/main/hidroana/mapa_area.png"/>
 
 ## Funções de Apoio
 
