@@ -47,7 +47,8 @@ SERIE_RE = re.compile(
 )
 INVENTORY_RE = re.compile(
     r'<Table diffgr:id="Table[0-9]+" '
-    r'msdata:rowOrder="[0-9]+">(.*?)</Table>'
+    r'msdata:rowOrder="[0-9]+">(.*?)</Table>',
+    re.DOTALL
 )
 TAG_RE = re.compile(r"<([a-zA-Z0-9]+)>(.*?)</[a-zA-Z0-9]+>")
 
